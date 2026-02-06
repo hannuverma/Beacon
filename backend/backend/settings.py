@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'api',
+    'phonenumber_field'
 ]
 
 MIDDLEWARE = [
@@ -72,13 +74,23 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
+#     }
+# }
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "postgres",
+        "USER": "postgres.fsedbkqvmbbhtrfktwgp", # CHECK THIS in your 'Connect' popup!
+        "PASSWORD": "DutySync@2602",
+        "HOST": "aws-1-ap-southeast-2.pooler.supabase.com", # Use the pooler host!
+        "PORT": "6543", # The pooler usually uses 6543 instead of 5432
+        "pool_mode": "transaction", # Use transaction pooling for better performance
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
