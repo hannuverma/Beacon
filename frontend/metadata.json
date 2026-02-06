@@ -1,0 +1,7 @@
+{
+  "name": "NightOwl - Midnight Market Finder",
+  "description": "A real-time dark-themed mobile map app that helps users find open night vendors, street food, and late-night events. Features AI-powered item queries and vendor live-status management.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
