@@ -91,12 +91,18 @@ const NightMap = ({
     userLocation.lat !== 0 ? userLocation.lat : DEFAULT_CENTER.lat;
   const centerLng =
     userLocation.lng !== 0 ? userLocation.lng : DEFAULT_CENTER.lng;
+  const centerLat =
+    userLocation.lat !== 0 ? userLocation.lat : DEFAULT_CENTER.lat;
+  const centerLng =
+    userLocation.lng !== 0 ? userLocation.lng : DEFAULT_CENTER.lng;
   if (!userLocation) return null;
+
   return (
     <MapContainer
       center={[userLocation.lat, userLocation.lng]}
       zoom={13}
       zoomControl={false}
+      style={{ height: "100vh", width: "100%" }}
       style={{ height: "100vh", width: "100%" }}
     >
       <TileLayer
