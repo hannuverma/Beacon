@@ -13,8 +13,6 @@ import CreateEventForm from "./components/CreateEvent";
 const DEFAULT_LOCATION = { lat: 28.6139, lng: 77.2090 }; // Delhi
 
 const App: React.FC = () => {
-  const { location: gpsLocation, error: locationError } = useUserLocation();
-
   const [user, setUser] = useState<UserProfile | null>(null);
   const [view, setView] = useState<AppView>(AppView.AUTH);
   const [events, setEvents] = useState<Events[]>([]);
@@ -90,8 +88,8 @@ const App: React.FC = () => {
         <div className="sidebar-logo">
           <Moon size={40} color="var(--amber)" fill="var(--amber)" />
         </div>
-
-        <button
+        
+        <button 
           onClick={() => setView(AppView.USER)}
           className={`sidebar-btn ${view === AppView.USER ? "active user" : ""}`}
           title="Explore Events"
@@ -109,7 +107,7 @@ const App: React.FC = () => {
           </button>
         )}
 
-        <button
+        <button 
           onClick={handleLogout}
           className="sidebar-btn sidebar-logout"
           title="Logout"
@@ -140,7 +138,7 @@ const App: React.FC = () => {
         <div className="panel-container">
           <div className="panel-inner">
             {view === AppView.USER ? (
-              <UserPanel
+              <UserPanel 
                 user={user!}
                 events={events}
                 selectedEvent={selectedEvent}

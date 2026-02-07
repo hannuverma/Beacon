@@ -141,26 +141,7 @@ class ListingListCreateAPIView(generics.ListCreateAPIView):
             queryset = queryset.filter(category__name=category_name)
         return queryset
 
-
 class ListingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
-
-
-@api_view(["GET"])
-def export_all(request):
-    """Return all categories, host profiles and listings as JSON."""
-    categories = Category.objects.all()
-    hosts = HostProfile.objects.all()
-    listings = Listing.objects.all()
-
-    cat_ser = CategorySerializer(categories, many=True)
-    host_ser = HostProfileSerializer(hosts, many=True)
-    list_ser = ListingSerializer(listings, many=True)
-
-    return Response({
-        "categories": cat_ser.data,
-        "hosts": host_ser.data,
-        "listings": list_ser.data,
-    })

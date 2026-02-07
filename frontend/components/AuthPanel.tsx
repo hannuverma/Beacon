@@ -11,15 +11,10 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [role, setRole] = useState<UserRole>('USER');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const API_BASE = 'http://127.0.0.1:8000';
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -171,8 +166,6 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
               type="password" 
               placeholder="Password" 
               className="auth-input"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
@@ -191,22 +184,8 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
             </div>
           )}
 
-          {error && (
-            <div style={{ 
-              marginBottom: '1rem', 
-              padding: '0.75rem', 
-              borderRadius: '0.75rem', 
-              background: 'rgba(239, 68, 68, 0.1)', 
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              color: '#fca5a5',
-              fontSize: '0.875rem'
-            }}>
-              {error}
-            </div>
-          )}
-
-          <button type="submit" className="auth-submit" disabled={loading}>
-            <span>{loading ? 'Loading...' : (isLogin ? 'Enter the Night' : 'Create Account')}</span>
+          <button type="submit" className="auth-submit">
+            <span>{isLogin ? 'Enter the Night' : 'Create Account'}</span>
             <ArrowRight size={20} />
           </button>
         </form>
