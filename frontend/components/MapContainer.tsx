@@ -96,7 +96,6 @@ const NightMap = ({
   const centerLng =
     userLocation.lng !== 0 ? userLocation.lng : DEFAULT_CENTER.lng;
   if (!userLocation) return null;
-
   return (
     <MapContainer
       center={[userLocation.lat, userLocation.lng]}
