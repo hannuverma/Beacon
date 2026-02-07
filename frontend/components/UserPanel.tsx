@@ -95,6 +95,7 @@ const UserPanel: React.FC<UserPanelProps> = ({
               <div
                 className="vendor-card"
                 onClick={() => onSelectEvent(event.id)}
+                style={{ margin: '0 0.75rem' }}
               >
                 <h3 className="font-bold">{event.title}</h3>
                 <p className="text-xs text-muted">{(event as any).host_name || 'Host'}</p>

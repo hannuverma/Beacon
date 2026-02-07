@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserRole, UserProfile } from '../types';
-import { Moon, User, Store, Mail, Lock, MapPin, ArrowRight } from 'lucide-react';
+import { User, Store, Mail, Lock, MapPin, ArrowRight } from 'lucide-react';
 
 interface AuthPanelProps {
   onAuthComplete: (user: UserProfile) => void;
@@ -112,10 +112,18 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
 
       <div className="auth-card">
         <div className="flex flex-col items-center" style={{ marginBottom: '2rem' }}>
-          <div className="sidebar-btn active user" style={{ marginBottom: '1rem', padding: '1rem', borderRadius: '1.5rem' }}>
-            <Moon size={32} />
+          <div style={{ 
+            marginBottom: '1rem', 
+            padding: '1rem', 
+            borderRadius: '1.5rem',
+            background: 'linear-gradient(135deg, #ffa60000 0%, #ffeb3b00 50%, #00000000 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <img src="http://127.0.0.1:8000/static/icon/logo2.png" alt="Beacon" style={{ width: '130px', height: '130px', objectFit: 'contain' }} />
           </div>
-          <h1 className="font-outfit" style={{ fontSize: '2rem', margin: 0 }}>NightOwl</h1>
+          <h1 className="font-outfit" style={{ fontSize: '2rem', margin: 0 }}>Beacon</h1>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Real-time midnight host finder</p>
         </div>
 

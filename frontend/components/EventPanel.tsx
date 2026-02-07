@@ -450,26 +450,29 @@ const EventPanel: React.FC<EventPanelProps> = ({ events, user, selectedEventId, 
                   Category
                 </label>
                 <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleFormChange}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    borderRadius: '0.75rem',
-                    border: '1px solid var(--border)',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    color: 'white',
-                    fontSize: '0.875rem',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <option value="1">Musical</option>
-                  <option value="2">Dance</option>
-                  <option value="3">Art</option>
-                  <option value="4">Shop</option>
-                  <option value="5">Service</option>
-                </select>
+                    name="category"
+                    value={formData.category}
+                    onChange={handleFormChange}
+                    style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        borderRadius: '0.75rem',
+                        border: '1px solid var(--border)',
+                        background: '#1a1a1a', // Use a solid dark hex instead of rgba for better browser compatibility
+                        color: 'white',
+                        fontSize: '0.875rem',
+                        boxSizing: 'border-box',
+                        cursor: 'pointer',
+                        appearance: 'none', // Optional: hides the default browser arrow for a cleaner look
+                    }}
+                    >
+                    {/* Add a style tag to the options or style them individually */}
+                    <option value="1" style={{ background: '#1a1a1a', color: 'white' }}>Musical</option>
+                    <option value="2" style={{ background: '#1a1a1a', color: 'white' }}>Dance</option>
+                    <option value="3" style={{ background: '#1a1a1a', color: 'white' }}>Art</option>
+                    <option value="4" style={{ background: '#1a1a1a', color: 'white' }}>Shop</option>
+                    <option value="5" style={{ background: '#1a1a1a', color: 'white' }}>Service</option>
+                    </select>
               </div>
 
               <div style={{ marginBottom: '1rem' }}>
