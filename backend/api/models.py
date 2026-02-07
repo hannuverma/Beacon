@@ -12,20 +12,19 @@ class Category(models.Model):
         ('service', 'Service'),
     ]
     name = models.CharField(max_length=50, choices=NAME_CHOICES)
-    icon_url = models.URLField(blank=True) # For custom map pins
+    icon_url = models.CharField(blank=True) # For custom map pins
 
-    def __str__(self):
+    def _str_(self):
         return self.name
 
 class HostProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = PhoneNumberField(blank=False, null=True, unique=True)
     bio = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     is_verified = models.BooleanField(default=False)
     
-    def __str__(self):
-        return f"{self.user.username} - {self.category}"
+    def _str_(self):
+        return f"{self.user.username}"
 
 class Listing(models.Model):
     LISTING_TYPES = [('event', 'Event'), ('service', 'Service')]
@@ -38,8 +37,8 @@ class Listing(models.Model):
     
     # Location Data
     # PointField stores (longitude, latitude)
-    latitude = models.FloatField(help_text="Latitude for map pin")
-    longitude = models.FloatField(help_text="Longitude for map pin")
+    latitude = models.FloatField(help_text="Latitude for map pin", null = True, blank = True)
+    longitude = models.FloatField(help_text="Longitude for map pin", null = True, blank = True)
     address = models.CharField(max_length=255)
     
     # Timing (Events have dates; services might have 'hours')
@@ -48,5 +47,5 @@ class Listing(models.Model):
     image = models.ImageField(upload_to='listings/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def _str_(self):
         return self.title
