@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import { AppView, Vendor, UserProfile } from "./types";
-import { INITIAL_VENDORS } from "./mockData";
+import React, { useState, useEffect  } from "react";
+import { AppView, Events, UserProfile } from "./types";
 import UserPanel from "./components/UserPanel";
-import VendorPanel from "./components/VendorPanel";
+import EventPanel from "./components/EventPanel";
 import MapContainer from "./components/MapContainer";
 import AuthPanel from "./components/AuthPanel";
-import { Moon, Store, User, LogOut } from "lucide-react";
+import { Moon, Calendar, User, LogOut } from "lucide-react";
 import "./leafletFix";
 import { useUserLocation } from "./src/userLocation";
+import axios from "axios";
+import CreateEventForm from "./components/CreateEvent";
 
 const DEFAULT_LOCATION = { lat: 28.6139, lng: 77.2090 }; // Delhi
 
@@ -16,12 +17,49 @@ const App: React.FC = () => {
 
   const [user, setUser] = useState<UserProfile | null>(null);
   const [view, setView] = useState<AppView>(AppView.AUTH);
-  const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS);
-  const [selectedVendorId, setSelectedVendorId] = useState<string | null>(null);
+  const [events, setEvents] = useState<Events[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [draftLocation, setDraftLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const selectedEvent =
+  Array.isArray(events)
+    ? events.find(e => e.id === selectedEventId) ?? null
+    : null;
+
+    
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const res = await axios.get("http://127.0.0.1:8000/api/export/");
+        setEvents(res.data.listings);
+      } catch (error) {
+        console.error("Failed to fetch events:", error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
+
+  const refetchEvents = async () => {
+    try {
+      const res = await axios.get("http://127.0.0.1:8000/api/export/");
+      setEvents(res.data.listings);
+    } catch (error) {
+      console.error("Failed to refetch events:", error);
+    }
+  };
+
+  const mapUserLocation =
+    gpsLocation ?? user?.homeLocation ?? DEFAULT_LOCATION;
+
 
   const handleAuth = (profile: UserProfile) => {
     setUser(profile);
-    setView(profile.role === "VENDOR" ? AppView.VENDOR : AppView.USER);
+    setView(profile.role === "HOST" ? AppView.HOST : AppView.USER);
+    console.log("Logged in user:", profile);
   };
 
   const handleLogout = () => {
@@ -29,17 +67,14 @@ const App: React.FC = () => {
     setView(AppView.AUTH);
   };
 
-  const toggleVendorStatus = (id: string) => {
-    setVendors((prev) =>
-      prev.map((v) => (v.id === id ? { ...v, isOpen: !v.isOpen } : v))
+  const toggleEventStatus = (id: number) => {
+    setEvents(prev =>
+      prev.map(e =>
+        e.id === id ? { ...e, isActive: !Boolean(e.isActive) } : e
+      )
     );
   };
 
-  const selectedVendor = vendors.find((v) => v.id === selectedVendorId) || null;
-
-  // 🔹 compute derived location INSIDE component
-  const mapUserLocation =
-    gpsLocation ?? user?.homeLocation ?? DEFAULT_LOCATION;
 
   if (view === AppView.AUTH) {
     return <AuthPanel onAuthComplete={handleAuth} />;
@@ -47,10 +82,6 @@ const App: React.FC = () => {
 
   if (locationError) {
     console.error("Location error:", locationError);
-  }
-
-  if (!mapUserLocation) {
-    return <div className="loading-screen">Fetching location…</div>;
   }
 
   return (
@@ -62,23 +93,19 @@ const App: React.FC = () => {
 
         <button
           onClick={() => setView(AppView.USER)}
-          className={`sidebar-btn ${
-            view === AppView.USER ? "active user" : ""
-          }`}
-          title="User Mode"
+          className={`sidebar-btn ${view === AppView.USER ? "active user" : ""}`}
+          title="Explore Events"
         >
           <User size={24} />
         </button>
 
-        {user?.role === "VENDOR" && (
+        {user?.role === "HOST" && (
           <button
-            onClick={() => setView(AppView.VENDOR)}
-            className={`sidebar-btn ${
-              view === AppView.VENDOR ? "active vendor" : ""
-            }`}
-            title="Vendor Mode"
+            onClick={() => setView(AppView.HOST)}
+            className={`sidebar-btn ${view === AppView.HOST ? "active host" : ""}`}
+            title="Manage Events"
           >
-            <Store size={24} />
+            <Calendar size={24} />
           </button>
         )}
 
@@ -92,12 +119,21 @@ const App: React.FC = () => {
       </nav>
 
       <main className="main-content">
+        {showCreateForm && (
+          <CreateEventForm
+            onClose={() => setShowCreateForm(false)}
+          />
+        )}
         <div className="map-layer">
           <MapContainer
-            vendors={vendors}
-            onVendorSelect={setSelectedVendorId}
-            selectedVendorId={selectedVendorId}
+            events={events}
             userLocation={mapUserLocation}
+            draftLocation={draftLocation}
+            onEventSelect={setSelectedEventId}
+            selectedEventId={selectedEventId}
+            onMapClick={(lat, lng) =>
+              setDraftLocation({ lat, lng })
+            }
           />
         </div>
 
@@ -106,15 +142,20 @@ const App: React.FC = () => {
             {view === AppView.USER ? (
               <UserPanel
                 user={user!}
-                vendors={vendors}
-                selectedVendor={selectedVendor}
-                onCloseVendor={() => setSelectedVendorId(null)}
-                onSelectVendor={setSelectedVendorId}
+                events={events}
+                selectedEvent={selectedEvent}
+                onCloseEvent={() => setSelectedEventId(null)}
+                onSelectEvent={setSelectedEventId}
               />
             ) : (
-              <VendorPanel
-                vendors={vendors}
-                onToggleStatus={toggleVendorStatus}
+              <EventPanel
+                events={events}
+                user={user}
+                draftLocation={draftLocation}
+                onSetDraftLocation={setDraftLocation}
+                onToggleStatus={toggleEventStatus}
+                onCreateEvent={() => setShowCreateForm(true)}
+                onEventCreated={refetchEvents}
               />
             )}
           </div>

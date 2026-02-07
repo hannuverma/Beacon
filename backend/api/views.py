@@ -30,13 +30,15 @@ def login(request):
         return Response({"detail": "invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
     # Determine if user is a host/vendor
-    is_vendor = HostProfile.objects.filter(user=user).exists()
+    host_profile = HostProfile.objects.filter(user=user).first()
+    is_vendor = host_profile is not None
     
     profile = {
         "id": user.id,
         "email": user.email,
         "name": user.first_name or user.username,
-        "role": "VENDOR" if is_vendor else "USER",
+        "role": "HOST" if is_vendor else "USER",
+        "host_profile_id": host_profile.id if host_profile else None,
         "home_location": {
             "address": "",
             "lat": None,
@@ -91,7 +93,6 @@ def signup_host(request):
     password = data.get("password")
     phone = data.get("phone_number")
     bio = data.get("bio")
-    category_name = data.get("category")
     address = data.get("address")
     lat = data.get("latitude")
     lng = data.get("longitude")
@@ -106,24 +107,16 @@ def signup_host(request):
     user = User.objects.create_user(username=username, email=email, password=password, first_name=(name or ""))
 
     # resolve category
-    category_obj = None
-    if category_name:
-        try:
-            # try by id
-            category_obj = Category.objects.get(id=category_name)
-        except Exception:
-            try:
-                category_obj = Category.objects.get(name=category_name)
-            except Exception:
-                category_obj = None
 
-    host = HostProfile.objects.create(user=user, phone_number=phone, bio=(bio or ""), category=category_obj)
+
+    host = HostProfile.objects.create(user=user, phone_number=phone, bio=(bio or ""))
 
     resp = {
         "id": user.id,
         "email": user.email,
         "name": user.first_name or username,
-        "role": "VENDOR",
+        "role": "HOST",
+        "host_profile_id": host.id,
         "host_profile": HostProfileSerializer(host).data,
         "business_location": {
             "address": address or "",
