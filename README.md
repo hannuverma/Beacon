@@ -6,6 +6,12 @@
 
 Beacon is a live map-based software to discover Night-Life. It shows events and services provided by small artists and businesses, with safe navigation for user with help of community guidance. 
 
+![Front](https://github.com/hannuverma/Beacon/blob/main/front.png)
+
+![Problem](https://github.com/hannuverma/Beacon/blob/main/problem.png)
+
+![Sol](https://github.com/hannuverma/Beacon/blob/main/solution.png)
+
 
 ## Features
 
