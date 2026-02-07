@@ -11,23 +11,77 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [role, setRole] = useState<UserRole>('USER');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const API_BASE = 'http://127.0.0.1:8000';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mockUser: UserProfile = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      name: name || (isLogin ? 'Midnight Rider' : 'New Vendor'),
-      role,
-      homeLocation: {
-        lat: 40.7128 + (Math.random() - 0.5) * 0.01,
-        lng: -74.0060 + (Math.random() - 0.5) * 0.01,
-        address: address || '123 Neon Way'
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // Login flow
+        const res = await fetch(`${API_BASE}/api/login/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.detail || 'Login failed');
+          setLoading(false);
+          return;
+        }
+        const profile: UserProfile = {
+          id: String(data.id),
+          email: data.email,
+          name: data.name,
+          role: data.role,
+          homeLocation: {
+            lat: data.home_location?.lat || 0,
+            lng: data.home_location?.lng || 0,
+            address: data.home_location?.address || '',
+          },
+        };
+        onAuthComplete(profile);
+      } else {
+        // Signup flow
+        const endpoint = role === 'VENDOR' ? 'signup/host/' : 'signup/user/';
+        const res = await fetch(`${API_BASE}/api/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, address }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.detail || 'Signup failed');
+          setLoading(false);
+          return;
+        }
+        const profile: UserProfile = {
+          id: String(data.id),
+          email: data.email,
+          name: data.name,
+          role: data.role,
+          homeLocation: {
+            lat: data.home_location?.lat || data.business_location?.lat || 0,
+            lng: data.home_location?.lng || data.business_location?.lng || 0,
+            address: data.home_location?.address || data.business_location?.address || '',
+          },
+        };
+        onAuthComplete(profile);
       }
-    };
-    onAuthComplete(mockUser);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,6 +169,8 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
               type="password" 
               placeholder="Password" 
               className="auth-input"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
@@ -133,8 +189,22 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
             </div>
           )}
 
-          <button type="submit" className="auth-submit">
-            <span>{isLogin ? 'Enter the Night' : 'Create Account'}</span>
+          {error && (
+            <div style={{ 
+              marginBottom: '1rem', 
+              padding: '0.75rem', 
+              borderRadius: '0.75rem', 
+              background: 'rgba(239, 68, 68, 0.1)', 
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              color: '#fca5a5',
+              fontSize: '0.875rem'
+            }}>
+              {error}
+            </div>
+          )}
+
+          <button type="submit" className="auth-submit" disabled={loading}>
+            <span>{loading ? 'Loading...' : (isLogin ? 'Enter the Night' : 'Create Account')}</span>
             <ArrowRight size={20} />
           </button>
         </form>

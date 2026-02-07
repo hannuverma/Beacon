@@ -12,7 +12,7 @@ class Category(models.Model):
         ('service', 'Service'),
     ]
     name = models.CharField(max_length=50, choices=NAME_CHOICES)
-    icon_url = models.URLField(blank=True) # For custom map pins
+    icon_url = models.CharField(blank=True) # For custom map pins
 
     def __str__(self):
         return self.name
@@ -38,8 +38,8 @@ class Listing(models.Model):
     
     # Location Data
     # PointField stores (longitude, latitude)
-    latitude = models.FloatField(help_text="Latitude for map pin")
-    longitude = models.FloatField(help_text="Longitude for map pin")
+    latitude = models.FloatField(help_text="Latitude for map pin", null = True, blank = True)
+    longitude = models.FloatField(help_text="Longitude for map pin", null = True, blank = True)
     address = models.CharField(max_length=255)
     
     # Timing (Events have dates; services might have 'hours')

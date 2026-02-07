@@ -1,12 +1,22 @@
 from rest_framework import serializers
-from .models import Vendor, UserProfile
+from .models import Listing, Category, HostProfile
 
-class VendorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Vendor
-        fields = ['id', 'name', 'category', 'address', 'lat', 'lng', 'is_open', 'expected_purchases', 'expected_earnings']
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['id', 'name', 'email', 'home_address', 'home_lat', 'home_lng']
+class CategorySerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Category
+		fields = "__all__"
+
+
+class HostProfileSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = HostProfile
+		fields = "__all__"
+
+
+class ListingSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Listing
+		fields = "__all__"
+
+
