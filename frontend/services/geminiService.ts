@@ -1,14 +1,14 @@
 
 import { GoogleGenAI } from "@google/genai";
-import { Vendor, UserProfile } from "../types";
+import { host, UserProfile } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-export async function askGemini(prompt: string, user?: UserProfile, vendors?: Vendor[]): Promise<string> {
+export async function askGemini(prompt: string, user?: UserProfile, hosts?: host[]): Promise<string> {
   const contextText = `
     User Name: ${user?.name || 'Guest'}
     User Home: ${user?.homeLocation?.address || 'Not set'}
-    Nearby Vendors: ${vendors?.map(v => `${v.name} (${v.category}) at ${v.location.address}`).join(', ')}
+    Nearby hosts: ${hosts?.map(v => `${v.name} (${v.category}) at ${v.location.address}`).join(', ')}
   `;
 
   try {
@@ -16,7 +16,7 @@ export async function askGemini(prompt: string, user?: UserProfile, vendors?: Ve
       model: 'gemini-2.5-flash', // Supports Google Maps tool
       contents: prompt,
       config: {
-        systemInstruction: `You are the NightOwl AI. Use Google Maps grounding to help users find vendors near their home or specific landmarks. Context: ${contextText}`,
+        systemInstruction: `You are the NightOwl AI. Use Google Maps grounding to help users find hosts near their home or specific landmarks. Context: ${contextText}`,
         tools: [{ googleMaps: {} }],
         toolConfig: {
           retrievalConfig: {

@@ -10,7 +10,7 @@ html, body, #root {
   padding: 0 !important;
 }
 
-.vendor-marker {
+.host-marker {
   width: 14px;
   height: 14px;
   background: #fbbf24;
@@ -19,7 +19,7 @@ html, body, #root {
   box-shadow: 0 0 14px rgba(251,191,36,0.9);
 }
 
-.vendor-pulse {
+.host-pulse {
   position: absolute;
   inset: -12px;
   border-radius: 999px;
@@ -257,7 +257,7 @@ body {
   box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
 }
 
-.sidebar-btn.active.vendor {
+.sidebar-btn.active.host {
   background: var(--purple);
   color: white;
   box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
@@ -440,7 +440,7 @@ body {
 }
 
 .role-btn.active.user { border-color: var(--amber); background: rgba(251, 191, 36, 0.05); color: var(--amber); }
-.role-btn.active.vendor { border-color: var(--purple); background: rgba(168, 85, 247, 0.05); color: var(--purple); }
+.role-btn.active.host { border-color: var(--purple); background: rgba(168, 85, 247, 0.05); color: var(--purple); }
 
 .auth-submit {
   width: 100%;
@@ -537,7 +537,7 @@ body {
   box-shadow: 0 4px 12px rgba(251, 191, 36, 0.25);
 }
 
-.vendor-list {
+.host-list {
   padding: 0 1.5rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -545,7 +545,7 @@ body {
   overflow-y: auto;
 }
 
-.vendor-card {
+.host-card {
   background: rgba(23, 23, 23, 0.4);
   border: 1px solid var(--border);
   border-radius: 1.25rem;
@@ -554,7 +554,7 @@ body {
   transition: all 0.3s;
 }
 
-.vendor-card:hover {
+.host-card:hover {
   background: rgba(38, 38, 38, 0.6);
   border-color: var(--amber);
 }
@@ -660,7 +660,7 @@ body {
   border: 2px solid rgba(255,255,255,0.2);
 }
 
-.vendor-marker-icon {
+.host-marker-icon {
   padding: 0.6rem;
   border-radius: 50%;
   border: 2px solid var(--border);
@@ -669,7 +669,7 @@ body {
   transition: all 0.3s;
 }
 
-.vendor-marker-icon.active {
+.host-marker-icon.active {
   background: var(--amber);
   color: black;
   border-color: white;
@@ -696,8 +696,8 @@ body {
   50% { transform: scale(1.1); opacity: 0.5; }
 }
 
-/* Vendor Portal */
-.vendor-portal-header {
+/* host Portal */
+.host-portal-header {
   padding: 2rem;
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.05) 50%, transparent 100%);
   border-bottom: 1.5px solid rgba(168, 85, 247, 0.2);

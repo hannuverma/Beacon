@@ -26,10 +26,10 @@ python manage.py runserver
 
 API endpoints:
 
-- `GET /api/vendors/` - list vendors
-- `POST /api/vendors/` - create vendor
-- `GET /api/vendors/{id}/` - retrieve vendor
-- `POST /api/vendors/{id}/toggle/` - toggle `is_open` state
+- `GET /api/hosts/` - list hosts
+- `POST /api/hosts/` - create host
+- `GET /api/hosts/{id}/` - retrieve host
+- `POST /api/hosts/{id}/toggle/` - toggle `is_open` state
 - `GET /api/users/` - list user profiles
 
 CORS:

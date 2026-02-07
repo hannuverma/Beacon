@@ -1,15 +1,42 @@
-import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Tooltip, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { Events } from "../types";
+
 
 const DEFAULT_CENTER = { lat: 28.6139, lng: 77.2090 }; // fallback
 
 
-export const vendorIcon = L.divIcon({
+export const hostIcon = L.divIcon({
   className: "",
   html: `
-    <div class="vendor-marker">
-      <div class="vendor-pulse"></div>
+    <div class="host-marker">
+      <div class="host-pulse"></div>
+    </div>
+  `,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
+});
+
+export const offlineIcon = L.divIcon({
+  className: "",
+  html: `
+    <div style="
+      width: 22px;
+      height: 22px;
+      background: #ef4444;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <div style="
+        width: 8px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+      "></div>
     </div>
   `,
   iconSize: [22, 22],
@@ -27,38 +54,71 @@ export const userIcon = L.divIcon({
   iconAnchor: [11, 11],
 });
 
-interface Vendor {
-  id: string;
-  name: string;
-  category: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
-}
+export const draftIcon = L.divIcon({
+  className: "",
+  html: `
+    <div style="
+      width: 24px;
+      height: 24px;
+      background: var(--amber);
+      border: 3px solid white;
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(217, 119, 6, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    ">
+      <div style="
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+      "></div>
+    </div>
+  `,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
+});
 
 interface MapProps {
-  vendors: Vendor[];
+  events: Events[];
   userLocation: {
     lat: number;
     lng: number;
   };
-  selectedVendorId: string | null;
-  onVendorSelect: (id: string) => void;
+  selectedEventId: number | null;
+  draftLocation?: { lat: number; lng: number } | null;
+  onEventSelect: (id: number) => void;
+  onMapClick?: (lat: number, lng: number) => void; 
 }
 
+
+
+const MapClickHandler = ({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) => {
+  useMapEvents({
+    click: (e) => {
+      if (onMapClick) {
+        onMapClick(e.latlng.lat, e.latlng.lng);
+      }
+    },
+  });
+  return null;
+};
+
 const NightMap = ({
-  vendors,
+  events,
   userLocation,
-  onVendorSelect,
-  selectedVendorId,
+  onEventSelect,
+  selectedEventId,
+  draftLocation,
+  onMapClick,
 }: MapProps) => {
   const centerLat =
     userLocation.lat !== 0 ? userLocation.lat : DEFAULT_CENTER.lat;
   const centerLng =
     userLocation.lng !== 0 ? userLocation.lng : DEFAULT_CENTER.lng;
   if (!userLocation) return null;
-  console.log("userLocation:", userLocation);
   return (
     <MapContainer
       center={[userLocation.lat, userLocation.lng]}
@@ -70,6 +130,8 @@ const NightMap = ({
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         attribution="© OpenStreetMap © Stadia Maps"
       />
+      <MapClickHandler onMapClick={onMapClick} />
+
       {/* User marker */}
       <Marker
         position={[userLocation.lat, userLocation.lng]}
@@ -87,28 +149,51 @@ const NightMap = ({
           </div>
         </Tooltip>
       </Marker>
-      {/* Vendor markers */}
-      {vendors.map((v) => (
-  <Marker
-    key={v.id}
-    icon={vendorIcon}
-    position={[v.location.lat, v.location.lng]}
-  >
+
+      {/* Draft location marker - selected for new event */}
+      {draftLocation && (
+        <Marker
+          position={[draftLocation.lat, draftLocation.lng]}
+          icon={draftIcon}
+        >
+          <Tooltip
+            direction="top"
+            offset={[-3, -18]}
+            opacity={1}
+            className="night-tooltip"
+          >
+            <div className="night-popup">
+              <div className="night-popup-title">New Event Location</div>
+              <div className="night-popup-sub">{draftLocation.lat.toFixed(4)}, {draftLocation.lng.toFixed(4)}</div>
+            </div>
+          </Tooltip>
+        </Marker>
+      )}
+
+      {/* host markers */}
+    {events
+      .filter(e => e.latitude != null && e.longitude != null)
+      .map(e => (
+        <Marker
+          key={e.id}
+          icon={e.isActive ? hostIcon : offlineIcon}
+          position={[e.latitude, e.longitude]}
+        >
     <Tooltip
       direction="top"
       offset={[-3, -16]}
       opacity={1}
       className="night-tooltip"
     >
-      <div className="night-popup">
-        <div className="night-popup-title">{v.name}</div>
-        <div className="night-popup-sub">{v.category}</div>
+        <div className="night-popup">
+          <div className="night-popup-title">{e.title}</div>
+          <div className="night-popup-sub">{(e as any).host_name || e.host || 'Host'}</div>
 
-        <div className="night-popup-meta">
-          <span className="dot open" />
-          <span>Live Now</span>
+          <div className="night-popup-meta">
+            <span className={`dot ${e.isActive ? 'open' : 'closed'}`} />
+            <span>{e.isActive ? 'Live Now' : 'Offline'}</span>
+          </div>
         </div>
-      </div>
     </Tooltip>
   </Marker>
 ))}

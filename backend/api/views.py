@@ -6,6 +6,8 @@ from .models import Listing, Category, HostProfile
 from .serializers import ListingSerializer, CategorySerializer, HostProfileSerializer
 from django.contrib.auth.models import User
 from rest_framework import status
+from django.db import transaction
+import traceback
 from django.contrib.auth import authenticate
 
 
@@ -29,14 +31,15 @@ def login(request):
     if not user.check_password(password):
         return Response({"detail": "invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-    # Determine if user is a host/vendor
-    is_vendor = HostProfile.objects.filter(user=user).exists()
-    
+    # Determine if user is a host/vendor and include host_profile_id
+    host_profile = HostProfile.objects.filter(user=user).first()
+
     profile = {
         "id": user.id,
         "email": user.email,
         "name": user.first_name or user.username,
-        "role": "VENDOR" if is_vendor else "USER",
+        "role": "HOST" if host_profile else "USER",
+        "host_profile_id": host_profile.id if host_profile else None,
         "home_location": {
             "address": "",
             "lat": None,
@@ -72,6 +75,7 @@ def signup_user(request):
         "email": user.email,
         "name": user.first_name or username,
         "role": "USER",
+        "host_profile_id": None,
         "home_location": {
             "address": address or "",
             "lat": lat,
@@ -102,37 +106,51 @@ def signup_host(request):
     if User.objects.filter(email=email).exists():
         return Response({"detail": "user with this email already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
-    username = email.split("@")[0]
-    user = User.objects.create_user(username=username, email=email, password=password, first_name=(name or ""))
+    try:
+        username = email.split("@")[0]
+        with transaction.atomic():
+            user = User.objects.create_user(username=username, email=email, password=password, first_name=(name or ""))
 
-    # resolve category
-    category_obj = None
-    if category_name:
+            # resolve category
+            category_obj = None
+            if category_name:
+                try:
+                    # try by id (allow int or string)
+                    category_obj = Category.objects.get(id=category_name)
+                except Exception:
+                    try:
+                        category_obj = Category.objects.get(name=category_name)
+                    except Exception:
+                        category_obj = None
+
+            # Ensure phone is None or string
+            phone_val = phone if phone not in (None, "") else None
+
+            host = HostProfile.objects.create(user=user, phone_number=phone_val, bio=(bio or ""), category=category_obj)
+
+            resp = {
+                "id": user.id,
+                "email": user.email,
+                "name": user.first_name or username,
+                "role": "HOST",
+                "host_profile_id": host.id,
+                "business_location": {
+                    "address": address or "",
+                    "lat": lat,
+                    "lng": lng,
+                }
+            }
+
+            return Response(resp, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        # If creation failed, attempt to cleanup partially created user
         try:
-            # try by id
-            category_obj = Category.objects.get(id=category_name)
+            if 'user' in locals() and user and user.id:
+                user.delete()
         except Exception:
-            try:
-                category_obj = Category.objects.get(name=category_name)
-            except Exception:
-                category_obj = None
-
-    host = HostProfile.objects.create(user=user, phone_number=phone, bio=(bio or ""), category=category_obj)
-
-    resp = {
-        "id": user.id,
-        "email": user.email,
-        "name": user.first_name or username,
-        "role": "VENDOR",
-        "host_profile": HostProfileSerializer(host).data,
-        "business_location": {
-            "address": address or "",
-            "lat": lat,
-            "lng": lng,
-        }
-    }
-
-    return Response(resp, status=status.HTTP_201_CREATED)
+            pass
+        tb = traceback.format_exc()
+        return Response({"detail": "Server error during host signup", "error": str(e), "trace": tb}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ListingListCreateAPIView(generics.ListCreateAPIView):
@@ -164,10 +182,18 @@ def export_all(request):
 
     cat_ser = CategorySerializer(categories, many=True)
     host_ser = HostProfileSerializer(hosts, many=True)
-    list_ser = ListingSerializer(listings, many=True)
+    list_ser = ListingSerializer(listings, many=True).data
+
+    # Enrich listings with host display name for frontend convenience
+    enriched = []
+    for raw, obj in zip(list_ser, listings):
+        host_user = obj.host.user
+        host_name = host_user.first_name or host_user.username
+        raw["host_name"] = host_name
+        enriched.append(raw)
 
     return Response({
         "categories": cat_ser.data,
         "hosts": host_ser.data,
-        "listings": list_ser.data,
+        "listings": enriched,
     })

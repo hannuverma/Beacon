@@ -12,19 +12,19 @@ class Category(models.Model):
         ('service', 'Service'),
     ]
     name = models.CharField(max_length=50, choices=NAME_CHOICES)
-    icon_url = models.CharField(blank=True) # For custom map pins
+    icon_url = models.CharField(max_length=255, blank=True) # For custom map pins
 
-    def _str_(self):
+    def __str__(self):
         return self.name
 
 class HostProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = PhoneNumberField(blank=False, null=True, unique=True)
+    phone_number = PhoneNumberField(blank=True, null=True)
     bio = models.TextField()
     is_verified = models.BooleanField(default=False)
     
-    def _str_(self):
-        return f"{self.user.username}"
+    def __str__(self):
+        return f"{self.user.first_name or self.user.username} (Host)"
 
 class Listing(models.Model):
     LISTING_TYPES = [('event', 'Event'), ('service', 'Service')]
@@ -45,7 +45,8 @@ class Listing(models.Model):
     event_date = models.DateTimeField(null=True, blank=True)
     booking_link = models.URLField()
     image = models.ImageField(upload_to='listings/', null=True, blank=True)
+    isActive = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
-        return self.title
+    def __str__(self):
+        return f"{self.title} ({self.get_listing_type_display()})"

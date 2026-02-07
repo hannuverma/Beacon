@@ -1,10 +1,10 @@
 
-import { Vendor } from './types';
+import { host } from './types';
 
-export const INITIAL_VENDORS: Vendor[] = [
+export const INITIAL_hostS: host[] = [
   {
     id: 'v1',
-    // Added missing ownerId required by Vendor type
+    // Added missing ownerId required by host type
     ownerId: 'owner-1',
     name: 'Midnight Ramen House',
     // Fix: 'Japanese Cuisine' is not assignable to the defined category union type
@@ -25,7 +25,7 @@ export const INITIAL_VENDORS: Vendor[] = [
   },
   {
     id: 'v2',
-    // Added missing ownerId required by Vendor type
+    // Added missing ownerId required by host type
     ownerId: 'owner-2',
     name: 'Glow Tacos',
     category: 'Street Food',
@@ -43,7 +43,7 @@ export const INITIAL_VENDORS: Vendor[] = [
   },
   {
     id: 'v3',
-    // Added missing ownerId required by Vendor type
+    // Added missing ownerId required by host type
     ownerId: 'owner-3',
     name: 'Lunar Coffee Bar',
     // Fix: 'Café' (with accent) is not assignable to 'Cafe' literal type

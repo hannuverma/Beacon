@@ -14,6 +14,11 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [bio, setBio] = useState('');
+  const [category, setCategory] = useState('1');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +48,7 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
           email: data.email,
           name: data.name,
           role: data.role,
+          host_profile_id: data.host_profile_id,
           homeLocation: {
             lat: data.home_location?.lat || 0,
             lng: data.home_location?.lng || 0,
@@ -52,11 +58,25 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
         onAuthComplete(profile);
       } else {
         // Signup flow
-        const endpoint = role === 'VENDOR' ? 'signup/host/' : 'signup/user/';
+        const endpoint = role === 'HOST' ? 'signup/host/' : 'signup/user/';
+        const payload = role === 'HOST'
+          ? {
+              name,
+              email,
+              password,
+              address,
+              phone_number: phoneNumber || undefined,
+              bio: bio || undefined,
+              category: category || undefined,
+              latitude: latitude ? parseFloat(latitude) : undefined,
+              longitude: longitude ? parseFloat(longitude) : undefined,
+            }
+          : { name, email, password, address };
+        
         const res = await fetch(`${API_BASE}/api/${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password, address }),
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -69,6 +89,7 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
           email: data.email,
           name: data.name,
           role: data.role,
+          host_profile_id: data.host_profile_id,
           homeLocation: {
             lat: data.home_location?.lat || data.business_location?.lat || 0,
             lng: data.home_location?.lng || data.business_location?.lng || 0,
@@ -95,7 +116,7 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
             <Moon size={32} />
           </div>
           <h1 className="font-outfit" style={{ fontSize: '2rem', margin: 0 }}>NightOwl</h1>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Real-time midnight vendor finder</p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Real-time midnight host finder</p>
         </div>
 
         <div className="auth-tabs">
@@ -128,11 +149,11 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
               </button>
               <button 
                 type="button"
-                onClick={() => setRole('VENDOR')}
-                className={`role-btn ${role === 'VENDOR' ? 'active vendor' : ''}`}
+                onClick={() => setRole('HOST')}
+                className={`role-btn ${role === 'HOST' ? 'active host' : ''}`}
               >
                 <Store size={20} />
-                <span style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', marginTop: '0.25rem' }}>Vendor</span>
+                <span style={{ fontSize: '0.65rem', fontWeight: 'bold', textTransform: 'uppercase', marginTop: '0.25rem' }}>host</span>
               </button>
             </div>
           )}
@@ -187,6 +208,74 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
                 required
               />
             </div>
+          )}
+
+          {!isLogin && role === 'HOST' && (
+            <>
+              <div className="auth-input-group">
+                <Mail className="auth-icon" size={18} />
+                <input 
+                  type="tel" 
+                  placeholder="Phone Number (Optional)" 
+                  className="auth-input"
+                  value={phoneNumber}
+                  onChange={e => setPhoneNumber(e.target.value)}
+                />
+              </div>
+
+              <div className="auth-input-group">
+                <User className="auth-icon" size={18} />
+                <textarea 
+                  placeholder="Business Bio (Optional)"
+                  className="auth-input"
+                  value={bio}
+                  onChange={e => setBio(e.target.value)}
+                  rows={2}
+                  style={{ fontFamily: 'inherit', resize: 'vertical' }}
+                />
+              </div>
+
+              <div className="auth-input-group">
+                <Store className="auth-icon" size={18} />
+                <select 
+                  className="auth-input"
+                  value={category}
+                  onChange={e => setCategory(e.target.value)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <option value="1">Musical</option>
+                  <option value="2">Dance</option>
+                  <option value="3">Art</option>
+                  <option value="4">Shop</option>
+                  <option value="5">Service</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div className="auth-input-group">
+                  <MapPin className="auth-icon" size={18} />
+                  <input 
+                    type="number" 
+                    placeholder="Latitude (Optional)"
+                    className="auth-input"
+                    value={latitude}
+                    onChange={e => setLatitude(e.target.value)}
+                    step="0.0001"
+                  />
+                </div>
+                <div className="auth-input-group">
+                  <MapPin className="auth-icon" size={18} />
+                  <input 
+                    type="number" 
+                    placeholder="Longitude (Optional)"
+                    className="auth-input"
+                    value={longitude}
+                    onChange={e => setLongitude(e.target.value)}
+                    step="0.0001"
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           {error && (
