@@ -2,6 +2,9 @@ import { MapContainer, TileLayer, Marker, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
+const DEFAULT_CENTER = { lat: 28.6139, lng: 77.2090 }; // fallback
+
+
 export const vendorIcon = L.divIcon({
   className: "",
   html: `
@@ -50,14 +53,18 @@ const NightMap = ({
   onVendorSelect,
   selectedVendorId,
 }: MapProps) => {
+  const centerLat =
+    userLocation.lat !== 0 ? userLocation.lat : DEFAULT_CENTER.lat;
+  const centerLng =
+    userLocation.lng !== 0 ? userLocation.lng : DEFAULT_CENTER.lng;
   if (!userLocation) return null;
-
+  console.log("userLocation:", userLocation);
   return (
     <MapContainer
       center={[userLocation.lat, userLocation.lng]}
       zoom={13}
       zoomControl={false}
-      className="w-full h-full"
+      style={{ height: "100vh", width: "100%" }}
     >
       <TileLayer
         url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
