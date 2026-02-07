@@ -1,15 +1,16 @@
+
 export enum AppView {
   AUTH = 'AUTH',
   USER = 'USER',
-  HOST = 'HOST'
+  VENDOR = 'VENDOR'
 }
 
-export type UserRole = 'USER' | 'HOST';
+export type UserRole = 'USER' | 'VENDOR';
 
 export interface Location {
   lat: number;
   lng: number;
-  address?: string;
+  address: string;
 }
 
 export interface UserProfile {
@@ -17,20 +18,40 @@ export interface UserProfile {
   email: string;
   name: string;
   role: UserRole;
-  host_profile_id?: number;
   homeLocation?: Location;
 }
 
-export interface Events {
-  id: number;
+export interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+}
+
+export interface Event {
+  id: string;
   title: string;
   description: string;
-  latitude: number;
-  longitude: number;
-  address: string;
-  event_date: string;
-  booking_link: string;
+  startTime: string;
+  type: 'sale' | 'challenge' | 'live-music' | 'other';
+}
+
+export interface Vendor {
+  id: string;
+  ownerId: string;
+  name: string;
+  category: 'Street Food' | 'Cafe' | 'Convenience' | 'Bar' | 'Late Night Retail';
+  rating: number;
+  location: Location;
+  isOpen: boolean;
   image: string;
-  category: number;
-  isActive?: boolean;
+  menu: MenuItem[];
+  events: Event[];
+  expectedPurchases: number;
+}
+
+export interface Message {
+  role: 'user' | 'assistant';
+  content: string;
 }

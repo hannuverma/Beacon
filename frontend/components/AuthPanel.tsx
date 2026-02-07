@@ -38,7 +38,6 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
           email: data.email,
           name: data.name,
           role: data.role,
-          host_profile_id: data.host_profile_id,
           homeLocation: {
             lat: data.home_location?.lat || 0,
             lng: data.home_location?.lng || 0,
@@ -65,7 +64,6 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
           email: data.email,
           name: data.name,
           role: data.role,
-          host_profile_id: data.host_profile_id,
           homeLocation: {
             lat: data.home_location?.lat || data.business_location?.lat || 0,
             lng: data.home_location?.lng || data.business_location?.lng || 0,

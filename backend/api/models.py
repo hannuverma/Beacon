@@ -21,10 +21,11 @@ class HostProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = PhoneNumberField(blank=False, null=True, unique=True)
     bio = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     is_verified = models.BooleanField(default=False)
     
     def __str__(self):
-        return f"{self.user.username}"
+        return f"{self.user.username} - {self.category}"
 
 class Listing(models.Model):
     LISTING_TYPES = [('event', 'Event'), ('service', 'Service')]
