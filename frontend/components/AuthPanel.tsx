@@ -22,7 +22,7 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE = 'http://127.0.0.1:8000';
+  const API_BASE = 'https://beacon-api-pzaa.onrender.com';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,7 +121,7 @@ const AuthPanel: React.FC<AuthPanelProps> = ({ onAuthComplete }) => {
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <img src="http://127.0.0.1:8000/static/icon/logo2.png" alt="Beacon" style={{ width: '130px', height: '130px', objectFit: 'contain' }} />
+            <img src="https://beacon-api-pzaa.onrender.com/static/icon/logo2.png" alt="Beacon" style={{ width: '130px', height: '130px', objectFit: 'contain' }} />
           </div>
           <h1 className="font-outfit" style={{ fontSize: '2rem', margin: 0 }}>Beacon</h1>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Real-time midnight host finder</p>

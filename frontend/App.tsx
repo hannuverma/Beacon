@@ -33,7 +33,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/api/export/");
+        const res = await axios.get("https://beacon-api-pzaa.onrender.com/api/export/");
         setEvents(res.data.listings);
       } catch (error) {
         console.error("Failed to fetch events:", error);
@@ -45,7 +45,7 @@ const App: React.FC = () => {
 
   const refetchEvents = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/export/");
+      const res = await axios.get("https://beacon-api-pzaa.onrender.com/api/export/");
       setEvents(res.data.listings);
     } catch (error) {
       console.error("Failed to refetch events:", error);
@@ -75,7 +75,7 @@ const App: React.FC = () => {
     );
     // Persist to backend
     const eventId = typeof id === 'string' ? parseInt(id) : id;
-    axios.patch(`http://127.0.0.1:8000/api/listings/${eventId}/`, { isActive: !events.find(e => e.id === eventId)?.isActive })
+    axios.patch(`https://beacon-api-pzaa.onrender.com/api/listings/${eventId}/`, { isActive: !events.find(e => e.id === eventId)?.isActive })
       .catch(err => console.error('Failed to toggle event status:', err));
   };
 

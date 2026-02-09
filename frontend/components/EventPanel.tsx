@@ -15,7 +15,7 @@ interface EventPanelProps {
   onEventCreated?: () => void;
 }
 
-const API_BASE = 'http://127.0.0.1:8000';
+const API_BASE = 'https://beacon-api-pzaa.onrender.com';
 
 const EventPanel: React.FC<EventPanelProps> = ({ events, user, selectedEventId, draftLocation, onSetDraftLocation, onToggleStatus, onCreateEvent, onSelectEvent, onEventCreated }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);

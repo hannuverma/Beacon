@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, React } from "react";
 import axios from "axios";
 
 interface Props {
@@ -20,7 +20,7 @@ const CreateEventForm: React.FC<Props> = ({ onClose }) => {
 
     try {
       await axios.post(
-        "http://127.0.0.1:8000/api/listings/",
+        "https://beacon-api-pzaa.onrender.com/api/listings/",
         {
           title,
           description,
